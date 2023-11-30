@@ -5,6 +5,31 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ]
+    ],
+    "headers": [ {
+      "source": "**/*.@(eot|otf|ttf|ttc|woff|font.css)",
+      "headers": [ {
+        "key": "Access-Control-Allow-Origin",
+        "value": "*"
+      } ]
+    }, {
+      "source": "**/*",
+      "headers": [ {
+        "key": "cross-origin-embedder-policy",
+        "value": "require-corp"
+      } ]
+    }, {
+      "source": "**/*",
+      "headers": [ {
+        "key": "cross-origin-opener-policy",
+        "value": "same-origin"
+      } ]
+    }, {
+      "source": "**/*",
+      "headers": [ {
+        "key": "cross-origin-resource-policy",
+        "value": "cross-origin"
+      } ]
+    } ]
   }
 }
