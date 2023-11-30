@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gadget Drone App</title>
   </head>
-  <script src="/osc.min.js" type="module"></script>
+  <script src="/osc.min.js" type="text/javascript"></script>
   <script type='text/javascript'>
     var sendOSC = function(name, ...args) {
       var data  = osc.writePacket({ address: name, args: args });
@@ -131,7 +131,7 @@
       };
       Module.setStatus("Sorry..Your browser does not support the sound server.");
     </script>
-    <script async type="module" src="/scsynth.js"></script>
+    <script async type="text/javascript" src="/scsynth.js"></script>
 
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
