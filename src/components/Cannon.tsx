@@ -132,13 +132,13 @@ const Cannon = () => {
       <Physics broadphase="SAP">
         <Plane rotation={[-Math.PI / 2, 0, 0]} />
         {/* Right */}
-        <Wall position={[2.5, 0, 0]} scale={[0.1, 2, 10]} color="#ffffff" />
+        <Wall position={[2.5, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
         {/* Left */}
-        <Wall position={[-2.5, 0, 0]} scale={[0.1, 2, 10]} color="#ffffff" />
+        <Wall position={[-2.5, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
         {/* Front */}
-        <Wall position={[0, 0, -2.5]} scale={[10, 2, 0.1]} color="#ffffff" />
+        <Wall position={[0, 0.5, -2.5]} scale={[10, 1, 0.1]} color="lightblue" />
         {/* Back */}
-        <Wall position={[0, 0, 2.5]} scale={[10, 2, 0.1]} color="#ffffff" />
+        <Wall position={[0, 0.5, 2.5]} scale={[10, 1, 0.1]} color="lightblue" />
         <InstancedGeometry {...{ colors, number, size }} />
       </Physics>
     </Canvas>
