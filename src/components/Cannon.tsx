@@ -1,5 +1,5 @@
 import type { PlaneProps, Triplet } from '@react-three/cannon'
-import { Physics, useBox, usePlane, useSphere } from '@react-three/cannon'
+import { Physics, useBox, usePlane, useSphere, CollideEvent } from '@react-three/cannon'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useMemo, useRef, useState, useEffect } from 'react'
 import type { InstancedMesh, Mesh } from 'three'
@@ -48,10 +48,18 @@ const Spheres = ({ colors, number, size }: InstancedGeometryProps) => {
       args: [size],
       mass: 1,
       position: [Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5],
+      onCollide: handleCollide,
     }),
     useRef<InstancedMesh>(null),
   )
   useFrame(() => at(Math.floor(Math.random() * number)).position.set(0, Math.random() * 2, 0))
+
+  const handleCollide = (e: CollideEvent) => {
+    // e.contact.contactPoint: 衝突した座標
+    // e.contact.impactVelocity: 衝突したときの速度
+    // console.log(e.contact.contactPoint, e.contact.impactVelocity)
+  }
+
   return (
     <instancedMesh receiveShadow castShadow ref={ref} args={[undefined, undefined, number]}>
       <sphereGeometry args={[size, 48]}>
