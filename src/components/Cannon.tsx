@@ -4,6 +4,8 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { useMemo, useRef, useState, useEffect } from 'react'
 import type { InstancedMesh, Mesh } from 'three'
 import { Color } from 'three'
+import Grid from '@mui/material/Grid'
+import { run } from '../utils/runScript'
 
 interface WallProps {
   position: [x: number, y: number, z: number];
@@ -96,11 +98,19 @@ const instancedGeometry = {
   sphere: Spheres,
 }
 
-const Cannon = () => {
-  const [geometry, setGeometry] = useState<'sphere'>('sphere')
+type ScProps = {
+  sharedArrayBufferEnable: boolean;
+  booting: boolean;
+  setBooting: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBooting }) => {
+  const [geometry, setGeometry] = useState<'sphere'|'box'>('sphere')
   const [number] = useState(150)
   const [size] = useState(0.1)
   const [widthRate, setWidthRate] = useState(1)
+  const [width, setWidth] = useState(0)
+  const [height, setHeight] = useState(0)
 
   const colors = useMemo(() => {
     const array = new Float32Array(number * 3)
@@ -115,48 +125,76 @@ const Cannon = () => {
 
   const InstancedGeometry = instancedGeometry[geometry]
 
+  const boot = () => {
+    run(`boot();d_sinewave();d_pinknoise();`);
+    setBooting(true);
+  }
+
+  const quit = () => {
+    run(`quit();`);
+    setBooting(false);
+  }
+
   useEffect(() => {
     const width = window.outerWidth
     const height = window.outerHeight
+    setWidth(width)
+    setHeight(height)
     setWidthRate(Math.min(width / height, 1))
   }, [])
 
   return (
-    <Canvas
-      shadows
-      gl={{
-        alpha: false,
-        // todo: stop using legacy lights
-        useLegacyLights: true,
-      }}
-      camera={{ fov: 40, position: [0, 7, 0] }}
-      // camera={{ fov: 40, position: [0, 0, 7] }}
-      onPointerMissed={() => setGeometry("sphere")}
-      onCreated={({ scene }) => (scene.background = new Color('lightblue'))}
-    >
-      <hemisphereLight intensity={0.35} />
-      <spotLight
-        position={[7, 7, 7]}
-        angle={0.3}
-        penumbra={1}
-        intensity={2}
-        castShadow
-        shadow-mapSize-width={256}
-        shadow-mapSize-height={256}
-      />
-      <Physics broadphase="SAP">
-        <Plane rotation={[-Math.PI / 2, 0, 0]} />
-        {/* Right */}
-        <Wall position={[2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
-        {/* Left */}
-        <Wall position={[-2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
-        {/* Front */}
-        <Wall position={[0, 0.5, -2.5]} scale={[10, 1, 0.1]} color="lightblue" />
-        {/* Back */}
-        <Wall position={[0, 0.5, 2.5]} scale={[10, 1, 0.1]} color="lightblue" />
-        <InstancedGeometry {...{ colors, number, size }} />
-      </Physics>
-    </Canvas>
+    <>
+      <Grid container justifyContent='center' alignItems='center' width='100vw' height='100vh' style={{position: 'absolute', zIndex: 100, fontSize: '15pt',}}>
+        {booting ? `` : `PLAY!`}
+        <Grid justifyContent='center' alignItems='center' style={{
+          position: 'absolute',
+          cursor: 'pointer',
+          width: Math.min(height * 0.25, width * 0.8),
+          height: Math.min(height * 0.25, width * 0.8),
+          border: booting || !sharedArrayBufferEnable ? '0px' : '1px solid',
+          borderRadius: '50%',
+          borderColor: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
+          color: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
+        }} onClick={()=>{if(!booting && sharedArrayBufferEnable)boot()}}>
+        </Grid>
+      </Grid>
+      <Canvas
+        shadows
+        gl={{
+          alpha: false,
+          // todo: stop using legacy lights
+          useLegacyLights: true,
+        }}
+        camera={{ fov: 40, position: [0, 7, 0] }}
+        // camera={{ fov: 40, position: [0, 0, 7] }}
+        onPointerMissed={() => setGeometry("sphere")}
+        onCreated={({ scene }) => (scene.background = new Color('lightblue'))}
+      >
+        <hemisphereLight intensity={0.35} />
+        <spotLight
+          position={[7, 7, 7]}
+          angle={0.3}
+          penumbra={1}
+          intensity={2}
+          castShadow
+          shadow-mapSize-width={256}
+          shadow-mapSize-height={256}
+        />
+        <Physics broadphase="SAP">
+          <Plane rotation={[-Math.PI / 2, 0, 0]} />
+          {/* Right */}
+          <Wall position={[2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
+          {/* Left */}
+          <Wall position={[-2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
+          {/* Front */}
+          <Wall position={[0, 0.5, -2.5]} scale={[10, 1, 0.1]} color="lightblue" />
+          {/* Back */}
+          <Wall position={[0, 0.5, 2.5]} scale={[10, 1, 0.1]} color="lightblue" />
+          {booting ? <InstancedGeometry {...{ colors, number, size }} /> : <></>}
+        </Physics>
+      </Canvas>
+    </>
   )
 }
 export default Cannon
