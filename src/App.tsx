@@ -1,9 +1,11 @@
 import React from 'react'
-import "./App.css"
+import Cannon from "./components/Cannon"
 
 const App: React.FC = () => {
   return (
-    <div>App</div>
+    <div style={{width: "100vw", height: "100vh"}}>
+      <Cannon/>
+    </div>
   )
 }
 
