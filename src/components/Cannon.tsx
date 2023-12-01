@@ -1,7 +1,7 @@
 import type { PlaneProps, Triplet } from '@react-three/cannon'
 import { Physics, useBox, usePlane, useSphere } from '@react-three/cannon'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import type { InstancedMesh, Mesh } from 'three'
 import { Color } from 'three'
 
@@ -92,6 +92,7 @@ const Cannon = () => {
   const [geometry, setGeometry] = useState<'sphere'>('sphere')
   const [number] = useState(150)
   const [size] = useState(0.1)
+  const [widthRate, setWidthRate] = useState(1)
 
   const colors = useMemo(() => {
     const array = new Float32Array(number * 3)
@@ -105,6 +106,12 @@ const Cannon = () => {
   }, [number])
 
   const InstancedGeometry = instancedGeometry[geometry]
+
+  useEffect(() => {
+    const width = window.outerWidth
+    const height = window.outerHeight
+    setWidthRate(Math.min(width / height, 1))
+  }, [])
 
   return (
     <Canvas
@@ -132,9 +139,9 @@ const Cannon = () => {
       <Physics broadphase="SAP">
         <Plane rotation={[-Math.PI / 2, 0, 0]} />
         {/* Right */}
-        <Wall position={[2.5, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
+        <Wall position={[2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
         {/* Left */}
-        <Wall position={[-2.5, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
+        <Wall position={[-2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
         {/* Front */}
         <Wall position={[0, 0.5, -2.5]} scale={[10, 1, 0.1]} color="lightblue" />
         {/* Back */}
