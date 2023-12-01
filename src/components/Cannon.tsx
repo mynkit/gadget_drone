@@ -6,6 +6,9 @@ import type { InstancedMesh, Mesh } from 'three'
 import { Color } from 'three'
 import Grid from '@mui/material/Grid'
 import { run } from '../utils/runScript'
+import { isSmartPhone } from '../utils/computerTerminal';
+
+const isTouchDevice = isSmartPhone();
 
 interface WallProps {
   position: [x: number, y: number, z: number];
@@ -49,12 +52,14 @@ const Spheres = ({ colors, number, size }: InstancedGeometryProps) => {
     () => ({
       args: [size],
       mass: 1,
-      position: [Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5],
+      position: [2*Math.random() - 1, Math.random() * 0.2, 2*Math.random() - 1], // 初期位置
       onCollide: handleCollide,
     }),
     useRef<InstancedMesh>(null),
   )
-  useFrame(() => at(Math.floor(Math.random() * number)).position.set(0, Math.random() * 2, 0))
+  useFrame(() => {
+    // at(Math.floor(Math.random() * number)).position.set(0, Math.random() * 2, 0)
+  })
 
   const handleCollide = (e: CollideEvent) => {
     e.contact.contactPoint // 衝突した座標
@@ -104,6 +109,11 @@ type ScProps = {
   setBooting: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+type XY = {
+  x: number;
+  y: number;
+}
+
 const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBooting }) => {
   const [geometry, setGeometry] = useState<'sphere'|'box'>('sphere')
   const [number] = useState(150)
@@ -111,6 +121,8 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const [widthRate, setWidthRate] = useState(1)
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
+  const [isTouched, setIsTouched] = useState(false)
+  const [touchPosition, setTouchPosition] = useState<XY>({x: 0, y: 0})
 
   const colors = useMemo(() => {
     const array = new Float32Array(number * 3)
@@ -140,7 +152,18 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
 
   return (
     <>
-      <Grid container justifyContent='center' alignItems='center' width='100vw' height='100vh' style={{position: 'absolute', zIndex: 100, fontSize: '15pt',}}>
+      <Grid
+        container
+        justifyContent='center'
+        alignItems='center'
+        width='100vw'
+        height='100vh'
+        style={{position: 'absolute', zIndex: 100, fontSize: '15pt',}}
+        onTouchStart={(e: React.TouchEvent<HTMLDivElement>)=>{if(isTouchDevice){setIsTouched(true);const touch=e.touches[0];if(touch){setTouchPosition({x: touch.clientX, y: touch.clientY})}}}}
+        onTouchEnd={(_: React.TouchEvent<HTMLDivElement>)=>{if(isTouchDevice){setIsTouched(false)}}}
+        onMouseDown={(e: React.MouseEvent<HTMLDivElement>)=>{if(!isTouchDevice){setIsTouched(true);setTouchPosition({x: e.clientX, y: e.clientY});}}}
+        onMouseUp={(_: React.MouseEvent<HTMLDivElement>)=>{if(!isTouchDevice){setIsTouched(false)}}}
+      >
         {booting ? `` : `PLAY!`}
         <Grid justifyContent='center' alignItems='center' style={{
           position: 'absolute',
