@@ -57,8 +57,8 @@ const Spheres = ({ colors, number, size }: InstancedGeometryProps) => {
   useFrame(() => at(Math.floor(Math.random() * number)).position.set(0, Math.random() * 2, 0))
 
   const handleCollide = (e: CollideEvent) => {
-    // e.contact.contactPoint: 衝突した座標
-    // e.contact.impactVelocity: 衝突したときの速度
+    e.contact.contactPoint // 衝突した座標
+    e.contact.impactVelocity // 衝突したときの速度
     // console.log(e.contact.contactPoint, e.contact.impactVelocity)
   }
 
@@ -128,11 +128,6 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const boot = () => {
     run(`boot();d_sinewave();d_pinknoise();`);
     setBooting(true);
-  }
-
-  const quit = () => {
-    run(`quit();`);
-    setBooting(false);
   }
 
   useEffect(() => {
