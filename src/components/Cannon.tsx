@@ -144,7 +144,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
         {booting ? `` : `PLAY!`}
         <Grid justifyContent='center' alignItems='center' style={{
           position: 'absolute',
-          cursor: 'pointer',
+          cursor: booting || !sharedArrayBufferEnable ? 'default' : 'pointer',
           width: Math.min(height * 0.25, width * 0.8),
           height: Math.min(height * 0.25, width * 0.8),
           border: booting || !sharedArrayBufferEnable ? '0px' : '1px solid',
