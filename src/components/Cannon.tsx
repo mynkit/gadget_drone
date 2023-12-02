@@ -189,8 +189,8 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const originXYToCanvasXY = (originXY: XY) => {
     const originX = originXY.x;
     const originY = originXY.y;
-    let canvasX = map(originX, Math.max((width-height)/2., 0), width - Math.max((width-height)/2., 0), -1.8*widthRate, 1.8*widthRate)
-    let canvasY = map(originY, 0, height, -1.8, 1.8)
+    let canvasX = map(originX, Math.max((width-height)/2., 0), width - Math.max((width-height)/2., 0), -2.3*widthRate, 2.3*widthRate)
+    let canvasY = map(originY, 0, height, -2.3, 2.3)
     return {x: canvasX, y: canvasY}
   }
 
