@@ -57,8 +57,8 @@ const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCan
   const [ref, { at }] = useSphere(
     () => ({
       args: [size],
-      mass: 1,
-      position: [3*Math.random()-1.5, Math.random() * 0.15, 3*Math.random() - 1.5], // 初期位置
+      mass: 0.1,
+      position: [3*Math.random()-1.5, Math.random() * 0.4, 3*Math.random() - 1.5], // 初期位置
       onCollide: handleCollide,
     }),
     useRef<InstancedMesh>(null),
@@ -68,7 +68,7 @@ const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCan
     if (frame%2==0) return
     if (isTouched) {
       const xy = originXYToCanvasXY(touchPosition)
-      at(Math.floor(Math.random() * number)).position.set(xy.x, Math.random() * 2, xy.y)
+      at(Math.floor(Math.random() * number)).position.set(xy.x, 0.1 + Math.random() * 0.7, xy.y)
     }
   })
   useEffect(()=>{
@@ -83,25 +83,25 @@ const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCan
     // console.log(e.contact.contactPoint, e.contact.impactVelocity)
 
     const velocity = e.contact.impactVelocity
-    const velocityMinTh = 0.3
+    const velocityMinTh = 0.5
     const velocityTh = 30
     if (velocity<velocityMinTh) return
 
     // console.log(e.contact.impactVelocity)
 
-    const bubbleSizeMin = 18.;
-    const bubbleSizeMax = 100.;
-    let amp = 1.;
+    const bubbleSizeMin = 20.;
+    const bubbleSizeMax = 115.;
+    let amp = 10.;
     if(amp<0.01){return;}
     let rand = Math.random();
-    let sustain = map(rand, 0, 1, 1/bubbleSizeMax, Math.min(1/bubbleSizeMin, 0.08)) *1.2;
+    let sustain = map(rand, 0, 1, 1/bubbleSizeMax, Math.min(1/bubbleSizeMin, 0.08)) *1.25;
     let freq = map(Math.sqrt(rand), 0, 1, bubbleSizeMax**2, bubbleSizeMin**2) * 1;
     let accelerate = map(rand, 0, 1, Math.sqrt(300/bubbleSizeMax), Math.sqrt(300/bubbleSizeMin));
-    let lpf = 10000;
+    let lpf = 8000;
     amp = amp * map(rand*rand, 0, 1, 0.1, 1);
     amp = amp * map(Math.random()*Math.random(), 0, 1, 0, 1);
     if (velocity<velocityTh) {
-      amp = amp * (Math.min(velocity*(1./velocityTh), 1.)**0.8);
+      amp = amp * (Math.min(velocity*(1./velocityTh), 1.)**0.9);
     }
     // console.log(`nodeId: ${nodeIdRef.current}`)
     run(`s_sinewave(${amp*0.3}, ${sustain}, ${0}, ${freq}, ${accelerate}, ${lpf}, ${nodeIdRef.current})`);
@@ -160,7 +160,7 @@ type XY = {
 
 const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBooting }) => {
   const [geometry, setGeometry] = useState<'sphere'|'box'>('sphere')
-  const [number] = useState(170)
+  const [number] = useState(150)
   const [size] = useState(0.11)
   const [widthRate, setWidthRate] = useState(1)
   const [width, setWidth] = useState(0)
