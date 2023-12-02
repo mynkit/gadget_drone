@@ -65,7 +65,7 @@ const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCan
   )
   useFrame(() => {
     setFrame(frame+1)
-    if (frame%2==0) return
+    // if (frame%2==0) return
     if (isTouched) {
       const xy = originXYToCanvasXY(touchPosition)
       at(Math.floor(Math.random() * number)).position.set(xy.x, 0.1 + Math.random() * 0.7, xy.y)
