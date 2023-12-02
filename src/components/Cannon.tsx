@@ -1,12 +1,13 @@
 import type { PlaneProps, Triplet } from '@react-three/cannon'
-import { Physics, useBox, usePlane, useSphere, CollideEvent } from '@react-three/cannon'
+import { Physics, useBox, usePlane, useSphere, CollideEvent, } from '@react-three/cannon'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useMemo, useRef, useState, useEffect } from 'react'
 import type { InstancedMesh, Mesh } from 'three'
 import { Color } from 'three'
 import Grid from '@mui/material/Grid'
 import { run } from '../utils/runScript'
-import { isSmartPhone } from '../utils/computerTerminal';
+import { isSmartPhone } from '../utils/computerTerminal'
+import { map } from '../utils/mathFunc'
 
 const isTouchDevice = isSmartPhone();
 
@@ -45,9 +46,13 @@ type InstancedGeometryProps = {
   colors: Float32Array
   number: number
   size: number
+  isTouched: boolean
+  touchPosition: XY
+  originXYToCanvasXY: (originXY: XY) => XY
 }
 
-const Spheres = ({ colors, number, size }: InstancedGeometryProps) => {
+const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCanvasXY }: InstancedGeometryProps) => {
+  const [frame, setFrame] = useState(0);
   const [ref, { at }] = useSphere(
     () => ({
       args: [size],
@@ -58,8 +63,18 @@ const Spheres = ({ colors, number, size }: InstancedGeometryProps) => {
     useRef<InstancedMesh>(null),
   )
   useFrame(() => {
-    // at(Math.floor(Math.random() * number)).position.set(0, Math.random() * 2, 0)
+    setFrame(frame+1)
+    if (frame%2==0) return
+    if (isTouched) {
+      const xy = originXYToCanvasXY(touchPosition)
+      at(Math.floor(Math.random() * number)).position.set(xy.x, Math.random() * 2, xy.y)
+    }
   })
+  useEffect(()=>{
+    if (frame>=60){
+      setFrame(0)
+    }
+  }, [frame])
 
   const handleCollide = (e: CollideEvent) => {
     e.contact.contactPoint // 衝突した座標
@@ -142,13 +157,31 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
     setBooting(true);
   }
 
+  const originXYToCanvasXY = (originXY: XY) => {
+    const originX = originXY.x;
+    const originY = originXY.y;
+    let canvasX = map(originX, Math.max((width-height)/2., 0), width - Math.max((width-height)/2., 0), -1.8*widthRate, 1.8*widthRate)
+    let canvasY = map(originY, 0, height, -1.8, 1.8)
+    return {x: canvasX, y: canvasY}
+  }
+
   useEffect(() => {
-    const width = window.outerWidth
-    const height = window.outerHeight
+    const width = window.innerWidth
+    const height = window.innerHeight
     setWidth(width)
     setHeight(height)
     setWidthRate(Math.min(width / height, 1))
   }, [])
+
+  useEffect(() => {
+    const preventDefault = (e: any) => e.preventDefault();
+    if (isTouched) {
+      document.addEventListener('touchmove', preventDefault, {passive: false});
+    } else {
+      document.removeEventListener('touchmove', preventDefault, false);
+    }
+    return () => document.removeEventListener('touchmove', preventDefault, false);
+  }, [isTouched])
 
   return (
     <>
@@ -161,8 +194,10 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
         style={{position: 'absolute', zIndex: 100, fontSize: '15pt',}}
         onTouchStart={(e: React.TouchEvent<HTMLDivElement>)=>{if(isTouchDevice){setIsTouched(true);const touch=e.touches[0];if(touch){setTouchPosition({x: touch.clientX, y: touch.clientY})}}}}
         onTouchEnd={(_: React.TouchEvent<HTMLDivElement>)=>{if(isTouchDevice){setIsTouched(false)}}}
+        onTouchMove={(e: React.TouchEvent<HTMLDivElement>)=>{if(isTouchDevice){const touch=e.touches[0];if(touch){setTouchPosition({x: touch.clientX, y: touch.clientY})}}}}
         onMouseDown={(e: React.MouseEvent<HTMLDivElement>)=>{if(!isTouchDevice){setIsTouched(true);setTouchPosition({x: e.clientX, y: e.clientY});}}}
         onMouseUp={(_: React.MouseEvent<HTMLDivElement>)=>{if(!isTouchDevice){setIsTouched(false)}}}
+        onMouseMove={(e: React.MouseEvent<HTMLDivElement>)=>{if(!isTouchDevice){setTouchPosition({x: e.clientX, y: e.clientY});}}}
       >
         {booting ? `` : `PLAY!`}
         <Grid justifyContent='center' alignItems='center' style={{
@@ -176,6 +211,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
           color: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
         }} onClick={()=>{if(!booting && sharedArrayBufferEnable)boot()}}>
         </Grid>
+        {/* {isTouched ? "isTouched" : <></>} */}
       </Grid>
       <Canvas
         shadows
@@ -209,7 +245,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
           <Wall position={[0, 0.5, -2.5]} scale={[10, 1, 0.1]} color="lightblue" />
           {/* Back */}
           <Wall position={[0, 0.5, 2.5]} scale={[10, 1, 0.1]} color="lightblue" />
-          {booting ? <InstancedGeometry {...{ colors, number, size }} /> : <></>}
+          {booting ? <InstancedGeometry {...{ colors, number, size, isTouched, touchPosition, originXYToCanvasXY }} /> : <></>}
         </Physics>
       </Canvas>
     </>
