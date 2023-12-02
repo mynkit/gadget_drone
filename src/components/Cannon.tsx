@@ -87,24 +87,25 @@ const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCan
     const velocityTh = 30
     if (velocity<velocityMinTh) return
 
-    // console.log(e.contact.impactVelocity)
+    // console.log(e.contact.contactPoint)
 
     const bubbleSizeMin = 20.;
     const bubbleSizeMax = 115.;
     let amp = 10.;
     if(amp<0.01){return;}
     let rand = Math.random();
-    let sustain = map(rand, 0, 1, 1/bubbleSizeMax, Math.min(1/bubbleSizeMin, 0.08)) *1.25;
-    let freq = map(Math.sqrt(rand), 0, 1, bubbleSizeMax**2, bubbleSizeMin**2) * 1;
-    let accelerate = map(rand, 0, 1, Math.sqrt(300/bubbleSizeMax), Math.sqrt(300/bubbleSizeMin));
-    let lpf = 8000;
+    const pan = map(e.contact.contactPoint[0], -2.3, 2.3, -1, 1)
+    const sustain = map(rand, 0, 1, 1/bubbleSizeMax, Math.min(1/bubbleSizeMin, 0.08)) *1.25;
+    const freq = map(Math.sqrt(rand), 0, 1, bubbleSizeMax**2, bubbleSizeMin**2) * 1;
+    const accelerate = map(rand, 0, 1, Math.sqrt(300/bubbleSizeMax), Math.sqrt(300/bubbleSizeMin));
+    const lpf = 8000;
     amp = amp * map(rand*rand, 0, 1, 0.1, 1);
     amp = amp * map(Math.random()*Math.random(), 0, 1, 0, 1);
     if (velocity<velocityTh) {
       amp = amp * (Math.min(velocity*(1./velocityTh), 1.)**0.9);
     }
     // console.log(`nodeId: ${nodeIdRef.current}`)
-    run(`s_sinewave(${amp*0.3}, ${sustain}, ${0}, ${freq}, ${accelerate}, ${lpf}, ${nodeIdRef.current})`);
+    run(`s_sinewave(${amp*0.3}, ${sustain}, ${pan}, ${freq}, ${accelerate}, ${lpf}, ${nodeIdRef.current})`);
     nodeIdRef.current += 1;
     if (nodeIdRef.current > 3000) {
       nodeIdRef.current = 1;
