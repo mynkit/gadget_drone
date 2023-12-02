@@ -53,11 +53,12 @@ type InstancedGeometryProps = {
 
 const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCanvasXY }: InstancedGeometryProps) => {
   const [frame, setFrame] = useState(0);
+  const nodeIdRef = useRef(1);
   const [ref, { at }] = useSphere(
     () => ({
       args: [size],
       mass: 1,
-      position: [2*Math.random() - 1, Math.random() * 0.2, 2*Math.random() - 1], // 初期位置
+      position: [3*Math.random()-1.5, Math.random() * 0.15, 3*Math.random() - 1.5], // 初期位置
       onCollide: handleCollide,
     }),
     useRef<InstancedMesh>(null),
@@ -80,6 +81,34 @@ const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCan
     e.contact.contactPoint // 衝突した座標
     e.contact.impactVelocity // 衝突したときの速度
     // console.log(e.contact.contactPoint, e.contact.impactVelocity)
+
+    const velocity = e.contact.impactVelocity
+    const velocityMinTh = 0.3
+    const velocityTh = 30
+    if (velocity<velocityMinTh) return
+
+    // console.log(e.contact.impactVelocity)
+
+    const bubbleSizeMin = 18.;
+    const bubbleSizeMax = 100.;
+    let amp = 1.;
+    if(amp<0.01){return;}
+    let rand = Math.random();
+    let sustain = map(rand, 0, 1, 1/bubbleSizeMax, Math.min(1/bubbleSizeMin, 0.08)) *1.2;
+    let freq = map(Math.sqrt(rand), 0, 1, bubbleSizeMax**2, bubbleSizeMin**2) * 1;
+    let accelerate = map(rand, 0, 1, Math.sqrt(300/bubbleSizeMax), Math.sqrt(300/bubbleSizeMin));
+    let lpf = 10000;
+    amp = amp * map(rand*rand, 0, 1, 0.1, 1);
+    amp = amp * map(Math.random()*Math.random(), 0, 1, 0, 1);
+    if (velocity<velocityTh) {
+      amp = amp * (Math.min(velocity*(1./velocityTh), 1.)**0.8);
+    }
+    // console.log(`nodeId: ${nodeIdRef.current}`)
+    run(`s_sinewave(${amp*0.3}, ${sustain}, ${0}, ${freq}, ${accelerate}, ${lpf}, ${nodeIdRef.current})`);
+    nodeIdRef.current += 1;
+    if (nodeIdRef.current > 3000) {
+      nodeIdRef.current = 1;
+    }
   }
 
   return (
@@ -131,8 +160,8 @@ type XY = {
 
 const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBooting }) => {
   const [geometry, setGeometry] = useState<'sphere'|'box'>('sphere')
-  const [number] = useState(150)
-  const [size] = useState(0.1)
+  const [number] = useState(170)
+  const [size] = useState(0.11)
   const [widthRate, setWidthRate] = useState(1)
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
