@@ -301,7 +301,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
           shadow-mapSize-width={256}
           shadow-mapSize-height={256}
         />
-        <Physics broadphase="SAP" gravity={[acceleration.x, acceleration.z, -acceleration.y]}>
+        <Physics broadphase="SAP" gravity={[acceleration.x, -8, -acceleration.y]}>
           <Plane rotation={[-Math.PI / 2, 0, 0]} />
           {/* Right */}
           <Wall position={[2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
