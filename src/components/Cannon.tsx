@@ -174,7 +174,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const [height, setHeight] = useState(0)
   const [isTouched, setIsTouched] = useState(false)
   const [touchPosition, setTouchPosition] = useState<XY>({x: 0, y: 0})
-  const [_, setAcceleration] = useState<XYZ>({ x: 0, y: 0, z: 0 });
+  const [acceleration, setAcceleration] = useState<XYZ>({ x: 0, y: 0, z: -9.8 });
 
   const colors = useMemo(() => {
     const array = new Float32Array(number * 3)
@@ -207,7 +207,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
     setAcceleration({
       x: newAcceleration.x || 0,
       y: newAcceleration.y || 0,
-      z: newAcceleration.z || 0,
+      z: newAcceleration.z || -9.8,
     });
   };
   const requestPermission = async () => {
@@ -301,7 +301,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
           shadow-mapSize-width={256}
           shadow-mapSize-height={256}
         />
-        <Physics broadphase="SAP">
+        <Physics broadphase="SAP" gravity={[acceleration.x, acceleration.z, -acceleration.y]}>
           <Plane rotation={[-Math.PI / 2, 0, 0]} />
           {/* Right */}
           <Wall position={[2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
