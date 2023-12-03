@@ -6,7 +6,7 @@ import type { InstancedMesh, Mesh } from 'three'
 import { Color } from 'three'
 import Grid from '@mui/material/Grid'
 import { run } from '../utils/runScript'
-import { isSmartPhone } from '../utils/computerTerminal'
+import { isSmartPhone, isAndroid } from '../utils/computerTerminal'
 import { map } from '../utils/mathFunc'
 
 const isTouchDevice = isSmartPhone();
@@ -176,6 +176,8 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const [touchPosition, setTouchPosition] = useState<XY>({x: 0, y: 0})
   const [acceleration, setAcceleration] = useState<XYZ>({ x: 0, y: 0, z: -9.8 });
 
+  const androidTerminal = isAndroid()
+
   const colors = useMemo(() => {
     const array = new Float32Array(number * 3)
     const color = new Color()
@@ -301,7 +303,11 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
           shadow-mapSize-width={256}
           shadow-mapSize-height={256}
         />
-        <Physics broadphase="SAP" gravity={[acceleration.x, -8, -acceleration.y]}>
+        <Physics broadphase="SAP" gravity={[
+          androidTerminal ? -acceleration.x : acceleration.x,
+          androidTerminal ? -acceleration.z : acceleration.z,
+          androidTerminal ? acceleration.y : -acceleration.y,
+        ]}>
           <Plane rotation={[-Math.PI / 2, 0, 0]} />
           {/* Right */}
           <Wall position={[2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />

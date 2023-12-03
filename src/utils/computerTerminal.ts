@@ -5,3 +5,12 @@ export const isSmartPhone = () => {
     return false;
   }
 }
+
+export const isAndroid = () => {
+  var ua = navigator.userAgent;
+  if (ua.indexOf('Android') > 0){
+    return true
+  } else {
+    return false
+  }
+}
