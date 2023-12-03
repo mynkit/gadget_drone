@@ -159,6 +159,12 @@ type XY = {
   y: number;
 }
 
+type XYZ = {
+  x: number;
+  y: number;
+  z: number;
+}
+
 const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBooting }) => {
   const [geometry, setGeometry] = useState<'sphere'|'box'>('sphere')
   const [number] = useState(150)
@@ -168,6 +174,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const [height, setHeight] = useState(0)
   const [isTouched, setIsTouched] = useState(false)
   const [touchPosition, setTouchPosition] = useState<XY>({x: 0, y: 0})
+  const [_, setAcceleration] = useState<XYZ>({ x: 0, y: 0, z: 0 });
 
   const colors = useMemo(() => {
     const array = new Float32Array(number * 3)
@@ -194,6 +201,35 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
     let canvasY = map(originY, 0, height, -2.3, 2.3)
     return {x: canvasX, y: canvasY}
   }
+
+  const handleMotionEvent = (event: any) => {
+    const newAcceleration = event.accelerationIncludingGravity;
+    setAcceleration({
+      x: newAcceleration.x || 0,
+      y: newAcceleration.y || 0,
+      z: newAcceleration.z || 0,
+    });
+  };
+  const requestPermission = async () => {
+    try {
+      await (DeviceMotionEvent as any).requestPermission();
+      window.addEventListener('devicemotion', handleMotionEvent, false);
+    } catch (error) {
+      console.error('デバイスモーションイベントのパーミッションの取得に失敗しました:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', handleMotionEvent, false);
+      return () => {
+        window.removeEventListener('devicemotion', handleMotionEvent);
+      };
+    } else {
+      console.log("加速度センサがサポートされていません。");
+    }
+  }, []);
+
 
   useEffect(() => {
     const width = window.innerWidth
@@ -239,9 +275,9 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
           borderRadius: '50%',
           borderColor: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
           color: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
-        }} onClick={()=>{if(!booting && sharedArrayBufferEnable)boot()}}>
+        }} onClick={()=>{if(!booting && sharedArrayBufferEnable)boot();requestPermission();}}>
         </Grid>
-        {/* {isTouched ? "isTouched" : <></>} */}
+        {/* {`${acceleration.x}, ${acceleration.y}, ${acceleration.z}`} */}
       </Grid>
       <Canvas
         shadows
