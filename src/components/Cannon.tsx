@@ -277,7 +277,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
           borderRadius: '50%',
           borderColor: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
           color: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
-        }} onClick={()=>{if(!booting && sharedArrayBufferEnable)boot();requestPermission();}}>
+        }} onClick={()=>{if(!booting && sharedArrayBufferEnable)boot(); if(isTouchDevice)requestPermission();}}>
         </Grid>
         {/* {`${acceleration.x}, ${acceleration.y}, ${acceleration.z}`} */}
       </Grid>
