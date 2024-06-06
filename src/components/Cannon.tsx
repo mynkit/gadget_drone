@@ -58,21 +58,21 @@ const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCan
     () => ({
       args: [size],
       mass: 0.1,
-      position: [3*Math.random()-1.5, Math.random() * 0.4, 3*Math.random() - 1.5], // 初期位置
+      position: [3 * Math.random() - 1.5, Math.random() * 0.4, 3 * Math.random() - 1.5], // 初期位置
       onCollide: handleCollide,
     }),
     useRef<InstancedMesh>(null),
   )
   useFrame(() => {
-    setFrame(frame+1)
+    setFrame(frame + 1)
     // if (frame%2==0) return
     if (isTouched) {
       const xy = originXYToCanvasXY(touchPosition)
       at(Math.floor(Math.random() * number)).position.set(xy.x, 0.1 + Math.random() * 0.7, xy.y)
     }
   })
-  useEffect(()=>{
-    if (frame>=60){
+  useEffect(() => {
+    if (frame >= 60) {
       setFrame(0)
     }
   }, [frame])
@@ -85,27 +85,27 @@ const Spheres = ({ colors, number, size, isTouched, touchPosition, originXYToCan
     const velocity = e.contact.impactVelocity
     const velocityMinTh = 0.5
     const velocityTh = 30
-    if (velocity<velocityMinTh) return
+    if (velocity < velocityMinTh) return
 
     // console.log(e.contact.contactPoint)
 
-    const bubbleSizeMin = 20.;
-    const bubbleSizeMax = 115.;
+    const bubbleSizeMin = 18.;
+    const bubbleSizeMax = 100.;
     let amp = 10.;
-    if(amp<0.01){return;}
+    if (amp < 0.01) { return; }
     let rand = Math.random();
     const pan = map(e.contact.contactPoint[0], -2.3, 2.3, -1, 1)
-    const sustain = map(rand, 0, 1, 1/bubbleSizeMax, Math.min(1/bubbleSizeMin, 0.08)) *1.25;
-    const freq = map(Math.sqrt(rand), 0, 1, bubbleSizeMax**2, bubbleSizeMin**2) * 1;
-    const accelerate = map(rand, 0, 1, Math.sqrt(300/bubbleSizeMax), Math.sqrt(300/bubbleSizeMin));
-    const lpf = 8000;
-    amp = amp * map(rand*rand, 0, 1, 0.1, 1);
-    amp = amp * map(Math.random()*Math.random(), 0, 1, 0, 1);
-    if (velocity<velocityTh) {
-      amp = amp * (Math.min(velocity*(1./velocityTh), 1.)**0.9);
+    const sustain = map(rand, 0, 1, 1 / bubbleSizeMax, Math.min(1 / bubbleSizeMin, 0.08)) * 1.1;
+    const freq = map(Math.sqrt(rand), 0, 1, bubbleSizeMax ** 2, bubbleSizeMin ** 2) * 1;
+    const accelerate = map(rand, 0, 1, Math.sqrt(300 / bubbleSizeMax), Math.sqrt(300 / bubbleSizeMin));
+    const lpf = 5000;
+    amp = amp * map(rand * rand, 0, 1, 0.1, 1);
+    amp = amp * map(Math.random() * Math.random(), 0, 1, 0, 1);
+    if (velocity < velocityTh) {
+      amp = amp * (Math.min(velocity * (1. / velocityTh), 1.) ** 0.9);
     }
     // console.log(`nodeId: ${nodeIdRef.current}`)
-    run(`s_sinewave(${amp*0.3}, ${sustain}, ${pan}, ${freq}, ${accelerate}, ${lpf}, ${nodeIdRef.current})`);
+    run(`s_sinewave(${amp * 0.3}, ${sustain}, ${pan}, ${freq}, ${accelerate}, ${lpf}, ${nodeIdRef.current})`);
     nodeIdRef.current += 1;
     if (nodeIdRef.current > 3000) {
       nodeIdRef.current = 1;
@@ -166,14 +166,14 @@ type XYZ = {
 }
 
 const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBooting }) => {
-  const [geometry, setGeometry] = useState<'sphere'|'box'>('sphere')
+  const [geometry, setGeometry] = useState<'sphere' | 'box'>('sphere')
   const [number] = useState(150)
   const [size] = useState(0.11)
   const [widthRate, setWidthRate] = useState(1)
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
   const [isTouched, setIsTouched] = useState(false)
-  const [touchPosition, setTouchPosition] = useState<XY>({x: 0, y: 0})
+  const [touchPosition, setTouchPosition] = useState<XY>({ x: 0, y: 0 })
   const [acceleration, setAcceleration] = useState<XYZ>({ x: 0, y: 0, z: -9.8 });
 
   const androidTerminal = isAndroid()
@@ -199,9 +199,9 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const originXYToCanvasXY = (originXY: XY) => {
     const originX = originXY.x;
     const originY = originXY.y;
-    let canvasX = map(originX, Math.max((width-height)/2., 0), width - Math.max((width-height)/2., 0), -2.3*widthRate, 2.3*widthRate)
+    let canvasX = map(originX, Math.max((width - height) / 2., 0), width - Math.max((width - height) / 2., 0), -2.3 * widthRate, 2.3 * widthRate)
     let canvasY = map(originY, 0, height, -2.3, 2.3)
-    return {x: canvasX, y: canvasY}
+    return { x: canvasX, y: canvasY }
   }
 
   const handleMotionEvent = (event: any) => {
@@ -213,23 +213,23 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
     });
   };
   const requestPermission = async () => {
-    try {
-      await (DeviceMotionEvent as any).requestPermission();
-      window.addEventListener('devicemotion', handleMotionEvent, false);
-    } catch (error) {
-      console.error('デバイスモーションイベントのパーミッションの取得に失敗しました:', error);
-    }
+    // try {
+    //   await (DeviceMotionEvent as any).requestPermission();
+    //   window.addEventListener('devicemotion', handleMotionEvent, false);
+    // } catch (error) {
+    //   console.error('デバイスモーションイベントのパーミッションの取得に失敗しました:', error);
+    // }
   };
 
   useEffect(() => {
-    if (window.DeviceMotionEvent) {
-      window.addEventListener('devicemotion', handleMotionEvent, false);
-      return () => {
-        window.removeEventListener('devicemotion', handleMotionEvent);
-      };
-    } else {
-      console.log("加速度センサがサポートされていません。");
-    }
+    // if (window.DeviceMotionEvent) {
+    //   window.addEventListener('devicemotion', handleMotionEvent, false);
+    //   return () => {
+    //     window.removeEventListener('devicemotion', handleMotionEvent);
+    //   };
+    // } else {
+    //   console.log("加速度センサがサポートされていません。");
+    // }
   }, []);
 
 
@@ -244,7 +244,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   useEffect(() => {
     const preventDefault = (e: any) => e.preventDefault();
     if (isTouched) {
-      document.addEventListener('touchmove', preventDefault, {passive: false});
+      document.addEventListener('touchmove', preventDefault, { passive: false });
     } else {
       document.removeEventListener('touchmove', preventDefault, false);
     }
@@ -259,13 +259,13 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
         alignItems='center'
         width='100vw'
         height='100vh'
-        style={{position: 'absolute', zIndex: 100, fontSize: '15pt',}}
-        onTouchStart={(e: React.TouchEvent<HTMLDivElement>)=>{if(isTouchDevice){setIsTouched(true);const touch=e.touches[0];if(touch){setTouchPosition({x: touch.clientX, y: touch.clientY})}}}}
-        onTouchEnd={(_: React.TouchEvent<HTMLDivElement>)=>{if(isTouchDevice){setIsTouched(false)}}}
-        onTouchMove={(e: React.TouchEvent<HTMLDivElement>)=>{if(isTouchDevice){const touch=e.touches[0];if(touch){setTouchPosition({x: touch.clientX, y: touch.clientY})}}}}
-        onMouseDown={(e: React.MouseEvent<HTMLDivElement>)=>{if(!isTouchDevice){setIsTouched(true);setTouchPosition({x: e.clientX, y: e.clientY});}}}
-        onMouseUp={(_: React.MouseEvent<HTMLDivElement>)=>{if(!isTouchDevice){setIsTouched(false)}}}
-        onMouseMove={(e: React.MouseEvent<HTMLDivElement>)=>{if(!isTouchDevice){setTouchPosition({x: e.clientX, y: e.clientY});}}}
+        style={{ position: 'absolute', zIndex: 100, fontSize: '15pt', }}
+        onTouchStart={(e: React.TouchEvent<HTMLDivElement>) => { if (isTouchDevice) { setIsTouched(true); const touch = e.touches[0]; if (touch) { setTouchPosition({ x: touch.clientX, y: touch.clientY }) } } }}
+        onTouchEnd={(_: React.TouchEvent<HTMLDivElement>) => { if (isTouchDevice) { setIsTouched(false) } }}
+        onTouchMove={(e: React.TouchEvent<HTMLDivElement>) => { if (isTouchDevice) { const touch = e.touches[0]; if (touch) { setTouchPosition({ x: touch.clientX, y: touch.clientY }) } } }}
+        onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => { if (!isTouchDevice) { setIsTouched(true); setTouchPosition({ x: e.clientX, y: e.clientY }); } }}
+        onMouseUp={(_: React.MouseEvent<HTMLDivElement>) => { if (!isTouchDevice) { setIsTouched(false) } }}
+        onMouseMove={(e: React.MouseEvent<HTMLDivElement>) => { if (!isTouchDevice) { setTouchPosition({ x: e.clientX, y: e.clientY }); } }}
       >
         {booting ? `` : `PLAY!`}
         <Grid justifyContent='center' alignItems='center' style={{
@@ -277,7 +277,10 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
           borderRadius: '50%',
           borderColor: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
           color: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
-        }} onClick={()=>{if(!booting && sharedArrayBufferEnable)boot(); if(isTouchDevice)requestPermission();}}>
+        }} onClick={() => {
+          if (!booting && sharedArrayBufferEnable) boot();
+          if (isTouchDevice) requestPermission();
+        }}>
         </Grid>
         {/* {`${acceleration.x}, ${acceleration.y}, ${acceleration.z}`} */}
       </Grid>
@@ -310,9 +313,9 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
         ]}>
           <Plane rotation={[-Math.PI / 2, 0, 0]} />
           {/* Right */}
-          <Wall position={[2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
+          <Wall position={[2.5 * widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
           {/* Left */}
-          <Wall position={[-2.5*widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
+          <Wall position={[-2.5 * widthRate, 0.5, 0]} scale={[0.1, 1, 10]} color="lightblue" />
           {/* Front */}
           <Wall position={[0, 0.5, -2.5]} scale={[10, 1, 0.1]} color="lightblue" />
           {/* Back */}
