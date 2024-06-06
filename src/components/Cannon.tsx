@@ -166,6 +166,7 @@ type XYZ = {
 }
 
 const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBooting }) => {
+  const androidTerminal = isAndroid()
   const [geometry, setGeometry] = useState<'sphere' | 'box'>('sphere')
   const [number] = useState(150)
   const [size] = useState(0.11)
@@ -174,9 +175,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const [height, setHeight] = useState(0)
   const [isTouched, setIsTouched] = useState(false)
   const [touchPosition, setTouchPosition] = useState<XY>({ x: 0, y: 0 })
-  const [acceleration, setAcceleration] = useState<XYZ>({ x: 0, y: 0, z: -9.8 });
-
-  const androidTerminal = isAndroid()
+  const [acceleration, setAcceleration] = useState<XYZ>({ x: 0, y: 0, z: androidTerminal ? 9.8 : -9.8 });
 
   const colors = useMemo(() => {
     const array = new Float32Array(number * 3)
@@ -268,7 +267,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
         onMouseUp={(_: React.MouseEvent<HTMLDivElement>) => { if (!isTouchDevice) { setIsTouched(false) } }}
         onMouseMove={(e: React.MouseEvent<HTMLDivElement>) => { if (!isTouchDevice) { setTouchPosition({ x: e.clientX, y: e.clientY }); } }}
       >
-        {booting ? `` : `PLAY!`}
+        {booting || !sharedArrayBufferEnable ? `` : `PLAY!`}
         <Grid justifyContent='center' alignItems='center' style={{
           position: 'absolute',
           cursor: booting || !sharedArrayBufferEnable ? 'default' : 'pointer',
@@ -283,7 +282,18 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
           if (isTouchDevice) requestPermission();
         }}>
         </Grid>
-        {/* {`${acceleration.x}, ${acceleration.y}, ${acceleration.z}`} */}
+        {!booting && sharedArrayBufferEnable ? (
+          <div style={{ position: "fixed", top: height * 0.04, fontSize: "10pt" }}>
+            iPhoneの方はマナーモードを解除すると音が出ます<br />
+            Deactivate silent mode for sound (iPhone users only).
+          </div>
+        ) : <></>}
+        {!sharedArrayBufferEnable ? (
+          <div style={{ position: "fixed", top: height * 0.04, fontSize: "10pt" }}>
+            アプリ内でのブラウザではなく、<br />Google ChromeやSafariなどで開いてください<br />
+            Open in Google Chrome or Safari, not in Instagram app browser.
+          </div>
+        ) : <></>}
       </Grid>
       <Canvas
         shadows

@@ -15,7 +15,7 @@ const App: React.FC = () => {
     }
   }, [])
   return (
-    <div style={{ width: width, height: height }}>
+    <div style={{ width: width, height: height, fontFamily: `"Noto Sans JP", sans-serif` }}>
       <Cannon
         sharedArrayBufferEnable={sharedArrayBufferEnable}
         booting={booting}
