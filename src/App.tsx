@@ -3,15 +3,15 @@ import Cannon from "./components/Cannon"
 import { useWindowDimensions } from "./utils/windowDimensions";
 
 const App: React.FC = () => {
-  const [sharedArrayBufferEnable, setSharedArrayBufferEnable] = useState(false);
+  const [sharedArrayBufferEnable, setSharedArrayBufferEnable] = useState(-1);
   const [booting, setBooting] = useState(false);
   const { width, height } = useWindowDimensions()
   useEffect(() => {
     try {
       new SharedArrayBuffer(1);
-      setSharedArrayBufferEnable(true);
+      setSharedArrayBufferEnable(1);
     } catch {
-      setSharedArrayBufferEnable(false);
+      setSharedArrayBufferEnable(0);
     }
   }, [])
   return (

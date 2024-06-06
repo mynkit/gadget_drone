@@ -149,7 +149,7 @@ const instancedGeometry = {
 }
 
 type ScProps = {
-  sharedArrayBufferEnable: boolean;
+  sharedArrayBufferEnable: number;
   booting: boolean;
   setBooting: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -267,30 +267,30 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
         onMouseUp={(_: React.MouseEvent<HTMLDivElement>) => { if (!isTouchDevice) { setIsTouched(false) } }}
         onMouseMove={(e: React.MouseEvent<HTMLDivElement>) => { if (!isTouchDevice) { setTouchPosition({ x: e.clientX, y: e.clientY }); } }}
       >
-        {booting || !sharedArrayBufferEnable ? `` : `PLAY!`}
+        {booting ? `` : `PLAY!`}
         <Grid justifyContent='center' alignItems='center' style={{
           position: 'absolute',
-          cursor: booting || !sharedArrayBufferEnable ? 'default' : 'pointer',
+          cursor: booting ? 'default' : 'pointer',
           width: Math.min(height * 0.25, width * 0.8),
           height: Math.min(height * 0.25, width * 0.8),
-          border: booting || !sharedArrayBufferEnable ? '0px' : '1px solid',
+          border: booting ? '0px' : '1px solid',
           borderRadius: '50%',
-          borderColor: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
-          color: booting || !sharedArrayBufferEnable ? '#ccc' : 'black',
+          borderColor: booting ? '#ccc' : 'black',
+          color: booting ? '#ccc' : 'black',
         }} onClick={() => {
-          if (!booting && sharedArrayBufferEnable) boot();
+          if (!booting) boot();
           if (isTouchDevice) requestPermission();
         }}>
         </Grid>
-        {!booting && sharedArrayBufferEnable ? (
-          <div style={{ position: "fixed", top: height * 0.04, fontSize: "10pt" }}>
+        {!booting && sharedArrayBufferEnable === 1 ? (
+          <div style={{ position: "fixed", top: height * 0.04, fontSize: "10pt", textAlign: "center" }}>
             iPhoneの方はマナーモードを解除すると音が出ます<br />
             Deactivate silent mode for sound (iPhone users only).
           </div>
         ) : <></>}
-        {!sharedArrayBufferEnable ? (
-          <div style={{ position: "fixed", top: height * 0.04, fontSize: "10pt" }}>
-            アプリ内でのブラウザではなく、<br />Google ChromeやSafariなどで開いてください<br />
+        {sharedArrayBufferEnable === 0 ? (
+          <div style={{ position: "fixed", top: height * 0.04, fontSize: "10pt", textAlign: "center", backgroundColor: `rgba(255,255,255,0.4)` }}>
+            アプリ内でのブラウザではなく、<br />Google ChromeやSafariなどで開いてください(音が出ません)<br />
             Open in Google Chrome or Safari, not in Instagram app browser.
           </div>
         ) : <></>}
