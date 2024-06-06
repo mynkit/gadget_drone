@@ -258,8 +258,8 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
         container
         justifyContent='center'
         alignItems='center'
-        width='100vw'
-        height='100vh'
+        width='100%'
+        height='100%'
         style={{ position: 'absolute', zIndex: 100, fontSize: '15pt', }}
         onTouchStart={(e: React.TouchEvent<HTMLDivElement>) => { if (isTouchDevice) { setIsTouched(true); const touch = e.touches[0]; if (touch) { setTouchPosition({ x: touch.clientX, y: touch.clientY }) } } }}
         onTouchEnd={(_: React.TouchEvent<HTMLDivElement>) => { if (isTouchDevice) { setIsTouched(false) } }}
