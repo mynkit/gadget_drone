@@ -204,14 +204,14 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
     return { x: canvasX, y: canvasY }
   }
 
-  const handleMotionEvent = (event: any) => {
-    const newAcceleration = event.accelerationIncludingGravity;
-    setAcceleration({
-      x: newAcceleration.x || 0,
-      y: newAcceleration.y || 0,
-      z: newAcceleration.z || -9.8,
-    });
-  };
+  // const handleMotionEvent = (event: any) => {
+  //   const newAcceleration = event.accelerationIncludingGravity;
+  //   setAcceleration({
+  //     x: newAcceleration.x || 0,
+  //     y: newAcceleration.y || 0,
+  //     z: newAcceleration.z || -9.8,
+  //   });
+  // };
   const requestPermission = async () => {
     // try {
     //   await (DeviceMotionEvent as any).requestPermission();
@@ -230,6 +230,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
     // } else {
     //   console.log("加速度センサがサポートされていません。");
     // }
+    setAcceleration({ x: 0, y: 0, z: androidTerminal ? 9.8 : -9.8 })
   }, []);
 
 

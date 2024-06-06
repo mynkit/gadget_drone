@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import Cannon from "./components/Cannon"
+import { useWindowDimensions } from "./utils/windowDimensions";
 
 const App: React.FC = () => {
   const [sharedArrayBufferEnable, setSharedArrayBufferEnable] = useState(false);
   const [booting, setBooting] = useState(false);
+  const { width, height } = useWindowDimensions()
   useEffect(() => {
-    try{
+    try {
       new SharedArrayBuffer(1);
       setSharedArrayBufferEnable(true);
-    }catch{
+    } catch {
       setSharedArrayBufferEnable(false);
     }
   }, [])
   return (
-    <div style={{width: "100vw", height: "100vh"}}>
+    <div style={{ width: width, height: height }}>
       <Cannon
         sharedArrayBufferEnable={sharedArrayBufferEnable}
         booting={booting}
