@@ -176,6 +176,14 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const [isTouched, setIsTouched] = useState(false)
   const [touchPosition, setTouchPosition] = useState<XY>({ x: 0, y: 0 })
   const [acceleration, setAcceleration] = useState<XYZ>({ x: 0, y: 0, z: androidTerminal ? 9.8 : -9.8 });
+  const audioCtx = useRef<AudioContext | null>(null);
+
+  const audioCtxStateChange = () => {
+    if (audioCtx.current?.state === 'suspended') {
+      audioCtx.current.resume();
+      // console.log('AudioContext resumed manually!');
+    }
+  }
 
   const colors = useMemo(() => {
     const array = new Float32Array(number * 3)
@@ -191,6 +199,7 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
   const InstancedGeometry = instancedGeometry[geometry]
 
   const boot = () => {
+    audioCtxStateChange()
     run(`boot();d_sinewave();d_pinknoise();`);
     setBooting(true);
   }
@@ -219,6 +228,12 @@ const Cannon: React.FC<ScProps> = ({ sharedArrayBufferEnable, booting, setBootin
     //   console.error('デバイスモーションイベントのパーミッションの取得に失敗しました:', error);
     // }
   };
+
+  useEffect(() => {
+    if (!audioCtx.current) {
+      audioCtx.current = new window.AudioContext();
+    }
+  }, []);
 
   useEffect(() => {
     // if (window.DeviceMotionEvent) {
