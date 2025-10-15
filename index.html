@@ -87,7 +87,7 @@
     }
   </script>
   <body>
-    <div class="emscripten" id="status">Downloading...</div>
+    <div class="emscripten" id="status"></div>
     <div class="emscripten">
       <progress value="0" max="100" id="progress" hidden=1></progress>
     </div>
@@ -118,7 +118,7 @@
             progressElement.max = null;
             progressElement.hidden = true;
           }
-          statusElement.innerHTML = text.replace('Your browser does not support the sound server.', 'Your browser does not support the sound server.<a href="https://caniuse.com/sharedarraybuffer" target="_blank" rel="noopener noreferrer">(reference)</a>');
+          // statusElement.innerHTML = text.replace('Your browser does not support the sound server.', 'Your browser does not support the sound server.<a href="https://caniuse.com/sharedarraybuffer" target="_blank" rel="noopener noreferrer">(reference)</a>');
         },
         totalDependencies: 0,
         monitorRunDependencies: function(left) {
@@ -129,7 +129,7 @@
           bootElement.disabled = false;
         }
       };
-      Module.setStatus("Sorry..Your browser does not support the sound server.");
+      Module.setStatus("");
     </script>
     <script async type="text/javascript" src="/scsynth.js"></script>
 
